@@ -15,20 +15,21 @@ import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import context from "../context";
+import { Expediteur } from "../component/Expediteur";
+import { Destinataire } from "../component/Destinataire";
 
 export default function Message({ route }) {
   const to = route.params.ID;
-  const [destinataire, setDestinataire] = useState();
+/*   const [destinataire, setDestinataire] = useState(); */
   /*   console.log(to); */
   const { item: socket } = React.useContext(context);
   const [messages, setMessages] = React.useState();
+  const [listMessage, setListMessage]= React.useState([]);
 
   const sendMessage = () => {
-    console.log(to);
-    socket.emit("private", { messages, to });
-    socket.on("private message", (content) => {
-      console.log("ddddd", content);
-    });
+    setListMessage([...listMessage, messages])
+    setMessages('')
+/*  console.log(messages) */
   };
 
   return (
@@ -46,8 +47,7 @@ export default function Message({ route }) {
               <Avatar
                 bg="cyan.500"
                 source={{
-                  uri:
-                    "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
+                  uri: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
                 }}
                 size={"md"}
               >
@@ -94,45 +94,8 @@ export default function Message({ route }) {
       </Row>
       <Box flex={1} mx={2}>
         <ScrollView>
-          <Box mt={4}>
-            <Row justifyContent={"flex-end"}>
-              <Box maxW={"70%"} bgColor={"#5B5B5B"} p={1} borderRadius={10}>
-                <Text color={"white"}>bonjour cava ?</Text>
-              </Box>
-              <Box mx={1}>
-                <Avatar
-                  bg="cyan.500"
-                  source={{
-                    uri:
-                      "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-                  }}
-                  size={"sm"}
-                >
-                  TE
-                </Avatar>
-              </Box>
-            </Row>
-          </Box>
-          <Box my={4}>
-            <Row justifyContent={"flex-start"}>
-              <Box mx={1}>
-                <Avatar
-                  bg="cyan.500"
-                  source={{
-                    uri:
-                      "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-                  }}
-                  size={"sm"}
-                >
-                  TE
-                </Avatar>
-              </Box>
-              <Box maxW={"70%"} bgColor={"#5DD58D"} p={1} borderRadius={10}>
-                <Text color={"white"}>{destinataire?.message}</Text>
-              </Box>
-              <Text>{destinataire}</Text>
-            </Row>
-          </Box>
+          <Destinataire />
+          <Expediteur listMessage={listMessage} />
         </ScrollView>
       </Box>
       <Box p={2}>
