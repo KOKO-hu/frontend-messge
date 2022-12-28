@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { getSecureData, setAuthHeaders } from "./api/user";
 import { store } from "./reduceToolKit/store";
 import { Provider } from "react-redux";
-const socket = io("https://9984-41-79-219-148.eu.ngrok.io");
+const socket = io("https://709f-137-255-33-115.eu.ngrok.io");
 const Stack = createStackNavigator();
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);

@@ -11,7 +11,7 @@ import {
 } from "native-base";
 import { sendUser, setAuthHeaders } from "../api/user";
 import { useDispatch } from "react-redux";
-import { getUser } from "../reduceToolKit/userSlice";
+import { getUserReducer } from "../reduceToolKit/userSlice";
 /* import * as SecureStore from "expo-secure-store"; */
 export default function SignIn({ navigation }) {
   const [email, setEmail] = useState("");
@@ -19,11 +19,12 @@ export default function SignIn({ navigation }) {
   const dispatch = useDispatch();
   const connexion = async () => {
     const datauser = { email, motDePasse: password };
+    console.log(datauser);
     try {
       const { data } = await sendUser(datauser);
       if (data) {
         setAuthHeaders(data.tokens);
-        dispatch(getUser(data.user));
+        dispatch(getUserReducer(data.user));
         navigation.navigate("listMessage");
       }
     } catch (error) {
