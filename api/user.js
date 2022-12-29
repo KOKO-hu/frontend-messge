@@ -23,7 +23,7 @@ export const setSecureData = async (key, value) => {
 /* secure store  */
 export const getSecureData = async (key) => {
   let result = await SecureStore.getItemAsync(key);
-  console.log("ddd", result);
+
   return result;
 };
 export const setAuthHeaders = async (token) => {

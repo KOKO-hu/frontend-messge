@@ -19,7 +19,7 @@ export default function SignIn({ navigation }) {
   const dispatch = useDispatch();
   const connexion = async () => {
     const datauser = { email, motDePasse: password };
-    console.log(datauser);
+    /*     console.log(datauser); */
     try {
       const { data } = await sendUser(datauser);
       if (data) {
