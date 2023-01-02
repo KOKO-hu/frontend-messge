@@ -4,18 +4,18 @@ const userSlice = createSlice({
   name: "userReducer",
   initialState: {
     user: null,
-    socket: null,
+    Messages: null,
   },
   reducers: {
     getUserReducer(state, action) {
       state.user = action.payload;
       /*    console.log(action.payload); */
     },
-    getSocketReducer(state, action) {
-      state.socket = action.payload;
+    getMessageReducer(state, action) {
+      state.Messages = action.payload;
     },
   },
 });
 
-export const { getUserReducer, getSocketReducer } = userSlice.actions;
+export const { getUserReducer, getMessageReducer } = userSlice.actions;
 export default userSlice.reducer;

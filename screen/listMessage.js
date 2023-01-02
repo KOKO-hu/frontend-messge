@@ -16,25 +16,31 @@ import { getUser, getUserMe, logoutUser } from "../api/user";
 import { useDispatch, useSelector } from "react-redux";
 import { AntDesign } from "@expo/vector-icons";
 import { getUserReducer } from "../reduceToolKit/userSlice";
-import { Context } from "../context/SocketIoContext";
+import { Context, useSocketIo } from "../context/SocketIoContext";
+
 export default function ListMessage({ navigation }) {
   const [allUser, setAllUser] = useState([]);
   const [identity, setIdentity] = useState();
   const { user } = useSelector((state) => state.userReducer);
+  const socket = React.useContext(Context);
   const dispatch = useDispatch();
-  const contextSocket = useContext(Context);
-
   const logout = () => {
     logoutUser();
     navigation.navigate("signIn");
   };
 
   useEffect(() => {
+    if (user) {
+      socket.emit("login", { userId: user._id });
+    }
+
+    /*     socket.emit("login", { userId: user._id }); */
     const allUsers = async () => {
       try {
         const { data } = await getUser();
         if (data) {
           setAllUser(data);
+          console.log(data);
           const { data: me } = await getUserMe();
           dispatch(getUserReducer(me));
         }

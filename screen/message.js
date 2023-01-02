@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Avatar,
   Box,
@@ -10,49 +10,66 @@ import {
   Heading,
   Icon,
   ScrollView,
+  HStack,
+  Spinner,
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import context from "../context/SocketIoContext";
-
 import { getMessageMe, sendOfMessage } from "../api/user";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Expediteur } from "../component/Expediteur";
 import { Destinataire } from "../component/Destinataire";
-
+import { Context, useSocketIo } from "../context/SocketIoContext";
+import { getMessageReducer } from "../reduceToolKit/userSlice";
 export default function Message({ route }) {
+  const socket = React.useContext(Context);
   const to = route.params.ID;
+  const scrollViewRef = useRef(null);
   const selectorUser = useSelector((state) => state.userReducer.user);
-  const { item: socket } = React.useContext(context);
+  const MessageOfReducer = useSelector((state) => state.userReducer.Messages);
+  const [isLoading, setIsLoding] = useState(false);
   const [writeMessages, setWriteMessages] = React.useState();
   const [myMessage, setMyMessages] = React.useState([]);
   const [listMessage, setListMessage] = React.useState([]);
-
+  const dispatch = useDispatch();
   const sendMessage = async () => {
-    idwriter = {
+    scrollViewRef.current.scrollToEnd({ animated: true });
+    const idwriter = {
       id_user_expediteur: selectorUser._id,
       id_destinataire: to,
       message: writeMessages,
     };
-    /*   console.log(idwriter); */
+
     const { data } = await sendOfMessage(idwriter);
     if (data) {
+      socket.emit("private message", {
+        id_user_expediteur: selectorUser._id,
+        id_destinataire: to,
+        message: writeMessages,
+      });
     }
   };
   useEffect(() => {
-    const idusers = {
-      idSocket: socket.id,
-      myId: selectorUser,
-    };
-    socket.emit("connexion", idusers);
+    /*   console.log("cest", MessageOfReducer); */
+    socket.emit("login", { userId: selectorUser._id });
     const allMessage = async () => {
+      setIsLoding(true);
       const { data } = await getMessageMe(selectorUser._id, to);
       if (data) {
-        /*     console.log(data); */
+        dispatch(getMessageReducer(data));
+        console.log(MessageOfReducer);
         setMyMessages(data);
+        setIsLoding(false);
+        scrollViewRef.current.scrollToEnd({ animated: true });
       }
     };
+    socket.on("newMessage", (data) => {
+      console.log("les resultats", data);
+      /*   console.log(myMessage); */
+      setMyMessages([...myMessage, data]);
+    });
+
     allMessage();
   }, []);
 
@@ -118,23 +135,33 @@ export default function Message({ route }) {
         </Row>
       </Row>
       <Box flex={1} mx={2}>
-        <ScrollView>
-          {myMessage.map((item) => (
-            <>
-              {item.id_user_expediteur === selectorUser._id ? (
+        {isLoading ? (
+          <>
+            <HStack space={8} justifyContent="center">
+              <Spinner color="emerald.500" />
+            </HStack>
+          </>
+        ) : (
+          <>
+            <ScrollView ref={scrollViewRef}>
+              {myMessage.map((item) => (
                 <>
-                  <Expediteur listMessages={item} />
+                  {item.id_user_expediteur === selectorUser._id ? (
+                    <>
+                      <Expediteur listMessages={item} />
+                    </>
+                  ) : (
+                    <>
+                      <Destinataire listMessages={item} />
+                    </>
+                  )}
                 </>
-              ) : (
-                <>
-                  <Destinataire listMessages={item} />
-                </>
-              )}
-            </>
-          ))}
-          {/*      <Destinataire />
+              ))}
+              {/*      <Destinataire />
           <Expediteur listMessage={listMessage} /> */}
-        </ScrollView>
+            </ScrollView>
+          </>
+        )}
       </Box>
       <Box p={2}>
         <Row alignItems={"center"}>
