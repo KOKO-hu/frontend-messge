@@ -51,14 +51,13 @@ export default function Message({ route }) {
     }
   };
   useEffect(() => {
-    /*   console.log("cest", MessageOfReducer); */
     socket.emit("login", { userId: selectorUser._id });
     const allMessage = async () => {
       setIsLoding(true);
       const { data } = await getMessageMe(selectorUser._id, to);
       if (data) {
         dispatch(getMessageReducer(data));
-        console.log(MessageOfReducer);
+
         setMyMessages(data);
         setIsLoding(false);
         scrollViewRef.current.scrollToEnd({ animated: true });
@@ -66,7 +65,7 @@ export default function Message({ route }) {
     };
     socket.on("newMessage", (data) => {
       console.log("les resultats", data);
-      /*   console.log(myMessage); */
+
       setMyMessages([...myMessage, data]);
     });
 
