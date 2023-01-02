@@ -10,6 +10,9 @@ export const sendUser = (data) => {
 export const sendOfMessage = (data) => {
   return axios.post(`${API_URL}/api/sendMessage`, data);
 };
+export const listMessage = () => {
+  return axios.get(`${API_URL}/api/allMessage`);
+};
 export const getUserMe = () => {
   return axios.get(`${API_URL}/api/getUserMe`);
 };

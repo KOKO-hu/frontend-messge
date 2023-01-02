@@ -27,10 +27,13 @@ export default function Message({ route }) {
   const to = route.params.ID;
   const scrollViewRef = useRef(null);
   const selectorUser = useSelector((state) => state.userReducer.user);
+
   const MessageOfReducer = useSelector((state) => state.userReducer.Messages);
   const [isLoading, setIsLoding] = useState(false);
   const [writeMessages, setWriteMessages] = React.useState();
-  const [myMessage, setMyMessages] = React.useState([]);
+  const [myMessage, setMyMessages] = React.useState(
+    MessageOfReducer ? MessageOfReducer : []
+  );
   const [listMessage, setListMessage] = React.useState([]);
   const dispatch = useDispatch();
   const sendMessage = async () => {
@@ -51,7 +54,8 @@ export default function Message({ route }) {
     }
   };
   useEffect(() => {
-    socket.emit("login", { userId: selectorUser._id });
+    /*     console.log("mes messages", MessageOfReducer); */
+
     const allMessage = async () => {
       setIsLoding(true);
       const { data } = await getMessageMe(selectorUser._id, to);
@@ -65,7 +69,7 @@ export default function Message({ route }) {
     };
     socket.on("newMessage", (data) => {
       console.log("les resultats", data);
-
+      console.log([...myMessage, data]);
       setMyMessages([...myMessage, data]);
     });
 

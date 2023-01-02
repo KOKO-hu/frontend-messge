@@ -15,7 +15,11 @@ export default function SocketIoContext({ children }) {
   console.log(user);
   useEffect(() => {
     if (user) {
-      const _socket = io("https://cbb5-137-255-46-187.eu.ngrok.io");
+      const _socket = io("https://79fc-41-85-168-239.eu.ngrok.io", {
+        query: {
+          userId: user._id,
+        },
+      });
 
       setSocket(_socket);
     }

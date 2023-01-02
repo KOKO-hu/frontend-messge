@@ -30,10 +30,6 @@ export default function ListMessage({ navigation }) {
   };
 
   useEffect(() => {
-    if (user) {
-      socket.emit("login", { userId: user._id });
-    }
-
     /*     socket.emit("login", { userId: user._id }); */
     const allUsers = async () => {
       try {
