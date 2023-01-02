@@ -24,6 +24,7 @@ export default function SignIn({ navigation }) {
       if (data) {
         setAuthHeaders(data.tokens);
         dispatch(getUser(data.user));
+        
         navigation.navigate("listMessage");
       }
     } catch (error) {
