@@ -9,9 +9,14 @@ import {
   Image,
   Input,
 } from "native-base";
-import { sendUser, setAuthHeaders } from "../api/user";
+import {
+  getMessageMe,
+  listMessage,
+  sendUser,
+  setAuthHeaders,
+} from "../api/user";
 import { useDispatch } from "react-redux";
-import { getUser } from "../reduceToolKit/userSlice";
+import { getUserReducer, getMessageReducer } from "../reduceToolKit/userSlice";
 /* import * as SecureStore from "expo-secure-store"; */
 export default function SignIn({ navigation }) {
   const [email, setEmail] = useState("");
@@ -19,13 +24,17 @@ export default function SignIn({ navigation }) {
   const dispatch = useDispatch();
   const connexion = async () => {
     const datauser = { email, motDePasse: password };
+    /*     console.log(datauser); */
     try {
       const { data } = await sendUser(datauser);
       if (data) {
         setAuthHeaders(data.tokens);
-        dispatch(getUser(data.user));
-        
-        navigation.navigate("listMessage");
+        dispatch(getUserReducer(data.user));
+        const { data: lstMessage } = await listMessage();
+        if (lstMessage) {
+          dispatch(getMessageReducer(lstMessage));
+          navigation.navigate("listMessage");
+        }
       }
     } catch (error) {
       console.log(error);

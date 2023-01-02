@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Avatar,
   Box,
@@ -11,38 +11,42 @@ import {
   IconButton,
   Center,
 } from "native-base";
-import context from "../context";
+
 import { getUser, getUserMe, logoutUser } from "../api/user";
 import { useDispatch, useSelector } from "react-redux";
 import { AntDesign } from "@expo/vector-icons";
 import { getUserReducer } from "../reduceToolKit/userSlice";
+import { Context, useSocketIo } from "../context/SocketIoContext";
+
 export default function ListMessage({ navigation }) {
-  const { item: socket } = React.useContext(context);
   const [allUser, setAllUser] = useState([]);
   const [identity, setIdentity] = useState();
-  const { user } = useSelector((state) => state.userReducer); 
+  const { user } = useSelector((state) => state.userReducer);
+  const socket = React.useContext(Context);
   const dispatch = useDispatch();
   const logout = () => {
     logoutUser();
     navigation.navigate("signIn");
   };
-  const allUsers = async () => {
-    try {
-      const { data } = await getUser();
-      if (data) {
-        setAllUser(data);
-        const { data: me } = await getUserMe();
-        socket.emit("idUser", me?._id);
-          dispatch(getUserReducer(me));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
   useEffect(() => {
+    /*     socket.emit("login", { userId: user._id }); */
+    const allUsers = async () => {
+      try {
+        const { data } = await getUser();
+        if (data) {
+          setAllUser(data);
+          console.log(data);
+          const { data: me } = await getUserMe();
+          dispatch(getUserReducer(me));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
     allUsers();
-    
   }, []);
+
   return (
     <Box flex={1} safeArea bgColor={"white"}>
       <Box>
