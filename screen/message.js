@@ -38,20 +38,26 @@ export default function Message({ route }) {
   const dispatch = useDispatch();
   const sendMessage = async () => {
     scrollViewRef.current.scrollToEnd({ animated: true });
+
+    console.log(writeMessages);
     const idwriter = {
       id_user_expediteur: selectorUser._id,
       id_destinataire: to,
       message: writeMessages,
     };
 
-    const { data } = await sendOfMessage(idwriter);
+    socket.emit("private message", {
+      id_user_expediteur: selectorUser._id,
+      id_destinataire: to,
+      message: writeMessages,
+    });
+    setMyMessages([...myMessage, idwriter]);
+    /*  const { data } = await sendOfMessage(idwriter);
     if (data) {
-      socket.emit("private message", {
-        id_user_expediteur: selectorUser._id,
-        id_destinataire: to,
-        message: writeMessages,
-      });
-    }
+  
+
+      console.log("mes message", myMessage);
+    } */
   };
   useEffect(() => {
     /*     console.log("mes messages", MessageOfReducer); */
@@ -69,8 +75,7 @@ export default function Message({ route }) {
     };
     socket.on("newMessage", (data) => {
       console.log("les resultats", data);
-      console.log([...myMessage, data]);
-      setMyMessages([...myMessage, data]);
+      setMyMessages([...MessageOfReducer, data]);
     });
 
     allMessage();
