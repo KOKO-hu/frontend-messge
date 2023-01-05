@@ -13,25 +13,27 @@ import { getSecureData, setAuthHeaders } from "./api/user";
 import { store } from "./reduceToolKit/store";
 import { Provider, useSelector } from "react-redux";
 import SocketIoContext from "./context/SocketIoContext";
+import TabNavigator from "./tabNavigator/tabNavigator";
 
 const Stack = createStackNavigator();
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(async () => {
-    const token = await getSecureData("token");
-    if (token) {
-      setIsLoading(true);
-      const header = await setAuthHeaders(token);
-      /*       console.log("socket", selector);
-      socket = io("https://5c53-137-255-39-143.eu.ngrok.io"); */
-      console.log("super");
-      if (header) {
-        /*    console.log("super"); */
+  useEffect(() => {
+    verifedToken = async () => {
+      const token = await getSecureData("token");
+      if (token) {
+        setIsLoading(true);
+        const header = await setAuthHeaders(token);
+
+        if (header) {
+          /*    console.log("super"); */
+        }
+      } else {
+        setIsLoading(false);
       }
-    } else {
-      setIsLoading(false);
-    }
+    };
+    verifedToken();
   }, []);
   return (
     <NativeBaseProvider>
@@ -42,10 +44,11 @@ export default function App() {
               screenOptions={{
                 headerShown: false,
               }}
-              initialRouteName={isLoading ? "listMessage" : "signIn"}
+              initialRouteName={isLoading ? "friend" : "signIn"}
             >
+              <Stack.Screen name="friend" component={TabNavigator} />
               <Stack.Screen name="signIn" component={SignIn} />
-              <Stack.Screen name="listMessage" component={ListMessage} />
+
               <Stack.Screen name="message" component={Message} />
             </Stack.Navigator>
           </SocketIoContext>

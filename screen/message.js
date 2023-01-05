@@ -12,6 +12,7 @@ import {
   ScrollView,
   HStack,
   Spinner,
+  FlatList,
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -34,8 +35,10 @@ export default function Message({ route }) {
   const [myMessage, setMyMessages] = React.useState(
     MessageOfReducer ? MessageOfReducer : []
   );
+  const [p, setP] = React.useState(0);
   const [listMessage, setListMessage] = React.useState([]);
   const dispatch = useDispatch();
+  const [prevY, setPrevY] = useState(0);
   const sendMessage = async () => {
     scrollViewRef.current.scrollToEnd({ animated: true });
 
@@ -64,7 +67,7 @@ export default function Message({ route }) {
 
     const allMessage = async () => {
       setIsLoding(true);
-      const { data } = await getMessageMe(selectorUser._id, to);
+      const { data } = await getMessageMe(selectorUser._id, to, p);
       if (data) {
         dispatch(getMessageReducer(data));
 
@@ -80,6 +83,32 @@ export default function Message({ route }) {
 
     allMessage();
   }, []);
+  const handleScroll = async (event) => {
+    console.log(p);
+    const currentY = event.nativeEvent.contentOffset.y; // Position actuelle de la vue
+
+    if (prevY > currentY) {
+      setP(p - 1);
+      const { data } = await getMessageMe(selectorUser._id, to, p);
+      if (data) {
+        dispatch(getMessageReducer(data));
+        setMyMessages(data);
+      }
+      // Scroll vers le haut
+      /*  console.log("Scrolling up"); */
+    } else {
+      setP(p + 1);
+      const { data } = await getMessageMe(selectorUser._id, to, p);
+      if (data) {
+        dispatch(getMessageReducer(data));
+        setMyMessages(data);
+        setIsLoding(false);
+      }
+      /* console.log("Scrolling down"); */
+    }
+
+    setPrevY(currentY);
+  };
 
   return (
     <Box flex={1} safeArea>
@@ -151,7 +180,10 @@ export default function Message({ route }) {
           </>
         ) : (
           <>
-            <ScrollView ref={scrollViewRef}>
+            <ScrollView
+              ref={scrollViewRef}
+              onScroll={(event) => handleScroll(event)}
+            >
               {myMessage.map((item) => (
                 <>
                   {item.id_user_expediteur === selectorUser._id ? (
@@ -165,8 +197,6 @@ export default function Message({ route }) {
                   )}
                 </>
               ))}
-              {/*      <Destinataire />
-          <Expediteur listMessage={listMessage} /> */}
             </ScrollView>
           </>
         )}

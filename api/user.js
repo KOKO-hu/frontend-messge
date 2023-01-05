@@ -16,8 +16,10 @@ export const listMessage = () => {
 export const getUserMe = () => {
   return axios.get(`${API_URL}/api/getUserMe`);
 };
-export const getMessageMe = (expId, desId) => {
-  return axios.get(`${API_URL}/api/allMessage/${expId}/destinataire/${desId}`);
+export const getMessageMe = (expId, desId, nbre) => {
+  return axios.get(
+    `${API_URL}/api/allMessage/${expId}/destinataire/${desId}?p=${nbre}`
+  );
 };
 export const setSecureData = async (key, value) => {
   await SecureStore.setItemAsync(key, value);
